@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import com.hexin.plat.android.assist.record.RecordManager;
 import com.xiaojuchefu.prism.monitor.PrismConstants;
 import com.xiaojuchefu.prism.monitor.PrismMonitor;
 import com.xiaojuchefu.prism.monitor.core.WindowCallbacks;
@@ -36,11 +37,17 @@ public class PrismMonitorWindowCallbacks extends WindowCallbacks {
                     int[] location = new int[]{(int) touchRecord.mDownX, (int) touchRecord.mDownY};
                     View targetView = TouchTracker.findTargetView((ViewGroup) window.getDecorView(), touchRecord.isClick ? location : null);
                     if (targetView != null) {
-                        EventData eventData = TouchEventHelper.createEventData(window, targetView, touchRecord);
-                        if (eventData != null) {
-                            mPrismMonitor.post(eventData);
-                        }
+                        RecordManager.getInstance().showFloatingActionView(window.getContext());
+                        RecordManager.getInstance().setTargetView(window, targetView, touchRecord);
+//                        EventData eventData = TouchEventHelper.createEventData(window, targetView, touchRecord);
+//                        if (eventData != null) {
+//                            mPrismMonitor.post(eventData);
+//                        }
+                        return true;
                     }
+                } else {
+                    int[] location = new int[]{(int) touchRecord.mDownX, (int) touchRecord.mDownY};
+                    View targetView = TouchTracker.findTargetView((ViewGroup) window.getDecorView(), touchRecord.isClick ? location : null);
                 }
             }
         }

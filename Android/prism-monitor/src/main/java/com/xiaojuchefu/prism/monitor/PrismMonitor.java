@@ -8,6 +8,7 @@ import android.view.Window;
 
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.hexin.plat.android.assist.record.StorageManager;
 import com.xiaojuchefu.prism.monitor.core.GlobalWindowManager;
 import com.xiaojuchefu.prism.monitor.core.WindowCallbacks;
 import com.xiaojuchefu.prism.monitor.core.WindowObserver;
@@ -74,6 +75,7 @@ public class PrismMonitor {
         ProcessLifecycleOwner.get().getLifecycle().addObserver(mAppLifecycleObserver);
 
         GlobalWindowManager.getInstance().init(context);
+        StorageManager.getInstance().init(context);
 
         mActivityLifecycleCallbacks = new ActivityLifecycleCallbacks();
         mWindowObserverListener = new WindowObserver.WindowObserverListener() {
@@ -108,6 +110,11 @@ public class PrismMonitor {
             }
         }
         isMonitoring = true;
+    }
+
+    public void pause() {
+        if (!isInitialized || !isMonitoring) return;
+        isMonitoring = false; // 暂停
     }
 
     public void stop() {

@@ -1,7 +1,9 @@
 package com.xiaojuchefu.prism;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,11 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.eastwood.common.adapter.QuickAdapter;
 import com.eastwood.common.adapter.ViewHelper;
+import com.hexin.plat.android.assist.Assist;
+import com.hexin.plat.android.assist.callback.OnPlaybackCallback;
+import com.hexin.plat.android.assist.record.RecordManager;
 import com.xiaojuchefu.prism.monitor.PrismMonitor;
 import com.xiaojuchefu.prism.monitor.model.EventData;
 import com.xiaojuchefu.prism.playback.PlaybackHelper;
@@ -22,6 +24,11 @@ import com.xiaojuchefu.prism.playback.model.EventInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,16 +46,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Assist.initAssist(this);
+
         final Button startButton = findViewById(R.id.btn_start);
         final Button stopButton = findViewById(R.id.btn_stop);
         final View playbackLayout = findViewById(R.id.ll_playback);
+
+        RecordManager.getInstance().setOnPlaybackCallback(events -> {
+            playbackLayout.postDelayed(() -> PrismPlayback.getInstance().playback(events), 1000);
+        });
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlaybackEvents.clear();
-                PrismMonitor.getInstance().start();
-                PrismMonitor.getInstance().addOnPrismMonitorListener(mOnPrismMonitorListener);
+//                PrismMonitor.getInstance().start();
+//                PrismMonitor.getInstance().addOnPrismMonitorListener(mOnPrismMonitorListener);
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);
                 playbackLayout.setVisibility(View.GONE);
@@ -85,6 +98,21 @@ public class MainActivity extends AppCompatActivity {
                 }, 1000);
             }
         });
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        0);
+            }
+        }
 
     }
 

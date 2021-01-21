@@ -16,6 +16,7 @@ public class TouchRecord {
     public float mUpX;
     public float mUpY;
 
+    public int type;
     public boolean isClick;
 
     public void onActionDown(MotionEvent ev) {
@@ -32,7 +33,11 @@ public class TouchRecord {
         mUpX = ev.getX(pointIndex);
         mUpY = ev.getY(pointIndex);
 
-        isClick = Math.abs(mDownX - mUpX) < sTouchSlop && Math.abs(mDownY - mUpY) < sTouchSlop;
+        if (Math.abs(mDownX - mUpX) < sTouchSlop && Math.abs(mDownY - mUpY) < sTouchSlop) {
+            isClick = true;
+        } else {
+            isClick = false;
+        }
     }
 
     public class MoveTouch {
